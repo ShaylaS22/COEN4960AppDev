@@ -4,10 +4,9 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.graphics.Color;
-import android.media.MediaPlayer;
+import android.media.AudioAttributes;
+import android.media.SoundPool;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.Gravity;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
@@ -18,17 +17,20 @@ import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class MetronomeActivity extends AppCompatActivity {
 
-    private MediaPlayer mediaPlayer;
+    private SoundPool soundPool;
+    private int clickSoundId;
     private FrameLayout noteContainer;
     private EditText etBpm;
     private Button btnStartStop;
     private int bpm = 120;
     private boolean isRunning = false;
-    private final Handler handler = new Handler(Looper.getMainLooper());
-    private Runnable metronomeRunnable;
+    private ScheduledExecutorService executorService;
     private final Random random = new Random();
 
     // Editable list of colors for the musical notes
@@ -46,6 +48,8 @@ public class MetronomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_metronome);
+
+        initSoundPool();
 
         noteContainer = findViewById(R.id.noteContainer);
         etBpm = findViewById(R.id.etBpm);
@@ -65,6 +69,19 @@ public class MetronomeActivity extends AppCompatActivity {
         });
     }
 
+    private void initSoundPool() {
+        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build();
+        soundPool = new SoundPool.Builder()
+                .setMaxStreams(5)
+                .setAudioAttributes(audioAttributes)
+                .build();
+        // Loading the click sound. Ensure R.raw.metronome_click exists.
+        clickSoundId = soundPool.load(this, R.raw.metronome_click, 1);
+    }
+
     private void startMetronome() {
         updateBpm();
         if (bpm <= 0) return;
@@ -72,24 +89,26 @@ public class MetronomeActivity extends AppCompatActivity {
         isRunning = true;
         btnStartStop.setText("Stop Metronome");
 
-        long interval = 60000 / bpm;
+        long intervalMs = 60000 / bpm;
 
-        metronomeRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if (!isRunning) return;
-                playSound();
-                spawnNote();
-                handler.postDelayed(this, interval);
+        executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleAtFixedRate(() -> {
+            // Play sound immediately on the background thread for low latency
+            if (soundPool != null) {
+                soundPool.play(clickSoundId, 1.0f, 1.0f, 1, 0, 1.0f);
             }
-        };
-        handler.post(metronomeRunnable);
+            
+            // UI updates must be on the main thread
+            runOnUiThread(this::spawnNote);
+            
+        }, 0, intervalMs, TimeUnit.MILLISECONDS);
     }
 
     private void stopMetronome() {
         isRunning = false;
-        if (metronomeRunnable != null) {
-            handler.removeCallbacks(metronomeRunnable);
+        if (executorService != null) {
+            executorService.shutdownNow();
+            executorService = null;
         }
         btnStartStop.setText("Start Metronome");
     }
@@ -107,21 +126,6 @@ public class MetronomeActivity extends AppCompatActivity {
             bpm = 120;
         }
         etBpm.setText(String.valueOf(bpm));
-    }
-
-    private void playSound() {
-        try {
-            // Using a new MediaPlayer instance for each click/tick might be resource intensive.
-            // However, for simplicity and matching previous behavior, we'll create it here.
-            // A better way would be SoundPool or reusing MediaPlayer.
-            MediaPlayer mp = MediaPlayer.create(this, R.raw.metronome_click);
-            if (mp != null) {
-                mp.setOnCompletionListener(MediaPlayer::release);
-                mp.start();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private void spawnNote() {
@@ -159,5 +163,9 @@ public class MetronomeActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         stopMetronome();
+        if (soundPool != null) {
+            soundPool.release();
+            soundPool = null;
+        }
     }
 }
