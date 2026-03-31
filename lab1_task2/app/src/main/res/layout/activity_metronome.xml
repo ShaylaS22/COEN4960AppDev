@@ -25,6 +25,22 @@
         android:orientation="vertical"
         android:gravity="center">
 
+        <TextView
+            android:id="@+id/tvBpmLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="BPM:"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/etBpm"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:textAlignment="center"
+            android:hint="120"
+            android:layout_marginBottom="16dp"/>
+
         <Button
             android:id="@+id/btnPlaySound"
             android:layout_width="wrap_content"
