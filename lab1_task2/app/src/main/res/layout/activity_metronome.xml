@@ -4,6 +4,7 @@
     android:id="@+id/metronomeRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#E57373"
     android:padding="16dp">
 
     <Button
@@ -14,38 +15,47 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:text="Back"
+        android:textColor="@android:color/white"
         app:icon="@drawable/ic_back_arrow"
-        app:iconGravity="textStart" />
+        app:iconGravity="textStart"
+        app:iconTint="@android:color/white" />
 
     <LinearLayout
         android:id="@+id/contentLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:orientation="vertical"
         android:gravity="center">
 
-        <TextView
-            android:id="@+id/tvBpmLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="BPM:"
-            android:textSize="18sp" />
+        <ImageView
+            android:id="@+id/ivMetronome"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_marginBottom="32dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/metronome_1"
+            android:contentDescription="Metronome Visualizer" />
 
         <EditText
             android:id="@+id/etBpm"
-            android:layout_width="100dp"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:inputType="number"
-            android:textAlignment="center"
-            android:hint="120"
-            android:layout_marginBottom="16dp"/>
+            android:hint="BPM"
+            android:textColor="@android:color/white"
+            android:textColorHint="#CCFFFFFF"
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/btnPlaySound"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Play Metronome Sound" />
+            android:layout_marginTop="16dp"
+            android:text="Start Metronome"
+            android:backgroundTint="@android:color/white"
+            android:textColor="#E57373" />
 
         <TextView
             android:id="@+id/tvMetronomeLabel"
@@ -53,16 +63,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Metronome Activity"
+            android:textColor="@android:color/white"
             android:textSize="24sp" />
-
-        <!-- Container for the animated musical notes -->
-        <FrameLayout
-            android:id="@+id/noteContainer"
-            android:layout_width="100dp"
-            android:layout_height="150dp"
-            android:layout_marginTop="8dp"
-            android:clipChildren="false"
-            android:clipToPadding="false" />
     </LinearLayout>
 
 </RelativeLayout>

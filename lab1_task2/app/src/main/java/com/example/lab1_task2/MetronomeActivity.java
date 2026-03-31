@@ -1,22 +1,14 @@
 package com.example.lab1_task2;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
-import android.graphics.Color;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -25,23 +17,19 @@ public class MetronomeActivity extends AppCompatActivity {
 
     private SoundPool soundPool;
     private int clickSoundId;
-    private FrameLayout noteContainer;
     private EditText etBpm;
     private Button btnStartStop;
+    private ImageView ivMetronome;
     private int bpm = 120;
     private boolean isRunning = false;
     private ScheduledExecutorService executorService;
-    private final Random random = new Random();
-
-    // Editable list of colors for the musical notes
-    private final int[] noteColors = {
-            Color.parseColor("#F44336"), // Red
-            Color.parseColor("#2196F3"), // Blue
-            Color.parseColor("#4CAF50"), // Green
-            Color.parseColor("#FFEB3B"), // Yellow
-            Color.parseColor("#9C27B0"), // Purple
-            Color.parseColor("#FF9800"), // Orange
-            Color.parseColor("#00BCD4")  // Cyan
+    
+    private int currentFrameIndex = 0;
+    private final int[] metronomeFrames = {
+            R.drawable.metronome_1, R.drawable.metronome_2, R.drawable.metronome_3,
+            R.drawable.metronome_4, R.drawable.metronome_5, R.drawable.metronome_6,
+            R.drawable.metronome_7, R.drawable.metronome_8, R.drawable.metronome_9,
+            R.drawable.metronome_10, R.drawable.metronome_11, R.drawable.metronome_12
     };
 
     @Override
@@ -51,7 +39,7 @@ public class MetronomeActivity extends AppCompatActivity {
 
         initSoundPool();
 
-        noteContainer = findViewById(R.id.noteContainer);
+        ivMetronome = findViewById(R.id.ivMetronome);
         etBpm = findViewById(R.id.etBpm);
         etBpm.setText(String.valueOf(bpm));
 
@@ -78,7 +66,6 @@ public class MetronomeActivity extends AppCompatActivity {
                 .setMaxStreams(5)
                 .setAudioAttributes(audioAttributes)
                 .build();
-        // Loading the click sound. Ensure R.raw.metronome_click exists.
         clickSoundId = soundPool.load(this, R.raw.metronome_click, 1);
     }
 
@@ -88,20 +75,28 @@ public class MetronomeActivity extends AppCompatActivity {
 
         isRunning = true;
         btnStartStop.setText("Stop Metronome");
+        currentFrameIndex = 0;
 
-        long intervalMs = 60000 / bpm;
+        // 6 frames per beat (since clicks are on frames 1 and 7)
+        long frameIntervalMs = 60000 / (bpm * 6);
 
         executorService = Executors.newSingleThreadScheduledExecutor();
         executorService.scheduleAtFixedRate(() -> {
-            // Play sound immediately on the background thread for low latency
-            if (soundPool != null) {
-                soundPool.play(clickSoundId, 1.0f, 1.0f, 1, 0, 1.0f);
+            // Play sound on Frame 1 (index 0) and Frame 7 (index 6)
+            if (currentFrameIndex == 0 || currentFrameIndex == 6) {
+                if (soundPool != null) {
+                    soundPool.play(clickSoundId, 1.0f, 1.0f, 1, 0, 1.0f);
+                }
             }
             
-            // UI updates must be on the main thread
-            runOnUiThread(this::spawnNote);
+            // Update UI frame
+            final int frameRes = metronomeFrames[currentFrameIndex];
+            runOnUiThread(() -> ivMetronome.setImageResource(frameRes));
             
-        }, 0, intervalMs, TimeUnit.MILLISECONDS);
+            // Increment frame index
+            currentFrameIndex = (currentFrameIndex + 1) % metronomeFrames.length;
+            
+        }, 0, frameIntervalMs, TimeUnit.MILLISECONDS);
     }
 
     private void stopMetronome() {
@@ -111,6 +106,8 @@ public class MetronomeActivity extends AppCompatActivity {
             executorService = null;
         }
         btnStartStop.setText("Start Metronome");
+        // Reset to first frame or a static icon
+        runOnUiThread(() -> ivMetronome.setImageResource(R.drawable.metronome_icon));
     }
 
     private void updateBpm() {
@@ -118,45 +115,13 @@ public class MetronomeActivity extends AppCompatActivity {
         if (!bpmStr.isEmpty()) {
             try {
                 bpm = Integer.parseInt(bpmStr);
-                if (bpm <= 0) bpm = 120; // Default if invalid
+                if (bpm <= 0) bpm = 120;
             } catch (NumberFormatException e) {
                 bpm = 120;
             }
         } else {
             bpm = 120;
         }
-        etBpm.setText(String.valueOf(bpm));
-    }
-
-    private void spawnNote() {
-        if (noteContainer == null) return;
-
-        ImageView noteView = new ImageView(this);
-        noteView.setImageResource(R.drawable.ic_musical_note);
-
-        int color = noteColors[random.nextInt(noteColors.length)];
-        noteView.setColorFilter(color);
-
-        int size = (int) (40 * getResources().getDisplayMetrics().density);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(size, size);
-        params.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
-        noteView.setLayoutParams(params);
-
-        noteContainer.addView(noteView);
-
-        float distance = 200 * getResources().getDisplayMetrics().density;
-        ObjectAnimator animator = ObjectAnimator.ofFloat(noteView, "translationY", 0, -distance);
-        animator.setDuration(400);
-        animator.setInterpolator(new DecelerateInterpolator());
-
-        animator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                noteContainer.removeView(noteView);
-            }
-        });
-
-        animator.start();
     }
 
     @Override
