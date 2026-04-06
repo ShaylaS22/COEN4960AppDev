@@ -3,11 +3,11 @@ package com.example.lab1_task2;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -29,27 +29,6 @@ public class MainActivity extends AppCompatActivity {
 
         animationContainer = findViewById(R.id.animationContainer);
         startMusicNoteAnimation();
-
-        // Button Click Listeners
-        findViewById(R.id.button1).setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, MetronomeActivity.class);
-            startActivity(intent);
-        });
-
-        findViewById(R.id.button2).setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, TunerActivity.class);
-            startActivity(intent);
-        });
-
-        findViewById(R.id.button3).setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, SheetMusicActivity.class);
-            startActivity(intent);
-        });
-
-        findViewById(R.id.button4).setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, TranscriptorActivity.class);
-            startActivity(intent);
-        });
     }
 
     private void startMusicNoteAnimation() {
