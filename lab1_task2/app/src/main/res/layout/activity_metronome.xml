@@ -28,6 +28,17 @@
         android:orientation="vertical"
         android:gravity="center">
 
+        <!-- Tap Tempo Indicator -->
+        <TextView
+            android:id="@+id/tvTapIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="● TAP TEMPO ACTIVE"
+            android:textColor="#FFEB3B"
+            android:textStyle="bold"
+            android:visibility="invisible"
+            android:layout_marginBottom="8dp" />
+
         <ImageView
             android:id="@+id/ivMetronome"
             android:layout_width="250dp"
@@ -35,6 +46,8 @@
             android:layout_marginBottom="32dp"
             android:scaleType="fitCenter"
             android:src="@drawable/metronome_1"
+            android:clickable="true"
+            android:focusable="true"
             android:contentDescription="Metronome Visualizer" />
 
         <EditText

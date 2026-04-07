@@ -3,9 +3,13 @@ package com.example.lab1_task2;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,10 +24,17 @@ public class MetronomeActivity extends AppCompatActivity {
     private EditText etBpm;
     private Button btnStartStop;
     private ImageView ivMetronome;
+    private TextView tvTapIndicator;
     private int bpm = 120;
     private boolean isRunning = false;
     private ScheduledExecutorService executorService;
     
+    // Tap Tempo state
+    private long lastTapTime = 0;
+    private boolean isTapListening = false;
+    private final Handler tapTimeoutHandler = new Handler(Looper.getMainLooper());
+    private final Runnable tapTimeoutRunnable = this::deactivateTapTempo;
+
     private int currentFrameIndex = 0;
     private final int[] metronomeFrames = {
             R.drawable.metronome_1, R.drawable.metronome_2, R.drawable.metronome_3,
@@ -42,6 +53,7 @@ public class MetronomeActivity extends AppCompatActivity {
         ivMetronome = findViewById(R.id.ivMetronome);
         etBpm = findViewById(R.id.etBpm);
         etBpm.setText(String.valueOf(bpm));
+        tvTapIndicator = findViewById(R.id.tvTapIndicator);
 
         btnStartStop = findViewById(R.id.btnPlaySound);
         btnStartStop.setText("Start Metronome");
@@ -55,6 +67,51 @@ public class MetronomeActivity extends AppCompatActivity {
                 startMetronome();
             }
         });
+
+        // Tap Tempo logic on ImageView click
+        ivMetronome.setOnClickListener(v -> handleTapTempo());
+    }
+
+    private void handleTapTempo() {
+        long currentTime = System.currentTimeMillis();
+        
+        if (!isTapListening) {
+            // First tap: activate listener state
+            activateTapTempo();
+            lastTapTime = currentTime;
+        } else {
+            // Subsequent taps: calculate BPM
+            long delta = currentTime - lastTapTime;
+            if (delta > 0) {
+                int calculatedBpm = (int) (60000 / delta);
+                // Limit BPM to reasonable range
+                if (calculatedBpm > 20 && calculatedBpm < 300) {
+                    bpm = calculatedBpm;
+                    etBpm.setText(String.valueOf(bpm));
+                    
+                    // If metronome is running, restart it to sync with new BPM
+                    if (isRunning) {
+                        restartMetronome();
+                    }
+                }
+            }
+            lastTapTime = currentTime;
+        }
+
+        // Reset timeout: deactivate if no tap for 2 seconds
+        tapTimeoutHandler.removeCallbacks(tapTimeoutRunnable);
+        tapTimeoutHandler.postDelayed(tapTimeoutRunnable, 2000);
+    }
+
+    private void activateTapTempo() {
+        isTapListening = true;
+        tvTapIndicator.setVisibility(View.VISIBLE);
+    }
+
+    private void deactivateTapTempo() {
+        isTapListening = false;
+        tvTapIndicator.setVisibility(View.INVISIBLE);
+        lastTapTime = 0;
     }
 
     private void initSoundPool() {
@@ -77,23 +134,19 @@ public class MetronomeActivity extends AppCompatActivity {
         btnStartStop.setText("Stop Metronome");
         currentFrameIndex = 0;
 
-        // 6 frames per beat (since clicks are on frames 1 and 7)
         long frameIntervalMs = 60000 / (bpm * 6);
 
         executorService = Executors.newSingleThreadScheduledExecutor();
         executorService.scheduleAtFixedRate(() -> {
-            // Play sound on Frame 1 (index 0) and Frame 7 (index 6)
             if (currentFrameIndex == 0 || currentFrameIndex == 6) {
                 if (soundPool != null) {
                     soundPool.play(clickSoundId, 1.0f, 1.0f, 1, 0, 1.0f);
                 }
             }
             
-            // Update UI frame
             final int frameRes = metronomeFrames[currentFrameIndex];
             runOnUiThread(() -> ivMetronome.setImageResource(frameRes));
             
-            // Increment frame index
             currentFrameIndex = (currentFrameIndex + 1) % metronomeFrames.length;
             
         }, 0, frameIntervalMs, TimeUnit.MILLISECONDS);
@@ -106,8 +159,14 @@ public class MetronomeActivity extends AppCompatActivity {
             executorService = null;
         }
         btnStartStop.setText("Start Metronome");
-        // Reset to first frame or a static icon
-        runOnUiThread(() -> ivMetronome.setImageResource(R.drawable.metronome_icon));
+        runOnUiThread(() -> ivMetronome.setImageResource(R.drawable.metronome_1));
+    }
+
+    private void restartMetronome() {
+        if (executorService != null) {
+            executorService.shutdownNow();
+        }
+        startMetronome();
     }
 
     private void updateBpm() {
@@ -128,6 +187,7 @@ public class MetronomeActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         stopMetronome();
+        tapTimeoutHandler.removeCallbacks(tapTimeoutRunnable);
         if (soundPool != null) {
             soundPool.release();
             soundPool = null;
