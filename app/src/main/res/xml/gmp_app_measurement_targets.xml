@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ad-services-config>
+    <attestations>
+        <grant-all/>
+    </attestations>
+</ad-services-config>
