@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">JukeBox</string>
+    <string name="align_sheet_music">Align sheet music within view</string>
 </resources>
