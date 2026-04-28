@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import java.io.File;
+import java.io.InputStream;
 
 public class SheetMusicActivity extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
@@ -26,15 +28,15 @@ public class SheetMusicActivity extends AppCompatActivity {
     }
 
     private void playMidi() {
-        // Note: You need to place a midi file (e.g., sample.mid) in res/raw/
-        // For now, this is a placeholder implementation.
         try {
-            // If we had a midi file named 'sample_midi' in res/raw:
-             mediaPlayer = MediaPlayer.create(this, R.raw.midi_test);
+            // Convert sample MusicXML to MIDI
+            File midiFile = new File(getCacheDir(), "temp_midi.mid");
+            InputStream xmlInput = getResources().openRawResource(R.raw.sample_score);
+            MusicXmlToMidiConverter.convert(xmlInput, midiFile);
             
-            // Since no midi file exists yet, we show a message.
-            //Toast.makeText(this, "Please add a MIDI file to res/raw/ to enable playback.", Toast.LENGTH_LONG).show();
-            
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setDataSource(midiFile.getAbsolutePath());
+            mediaPlayer.prepare();
 
             if (mediaPlayer != null) {
                 mediaPlayer.setOnCompletionListener(mp -> {
@@ -47,6 +49,7 @@ public class SheetMusicActivity extends AppCompatActivity {
             
         } catch (Exception e) {
             e.printStackTrace();
+            Toast.makeText(this, "Error playing MusicXML: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 

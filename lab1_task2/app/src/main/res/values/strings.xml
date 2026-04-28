@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">JukeBox</string>
+    <string name="generate_and_play_midi">Generate and Play MIDI</string>
+    <string name="stop_midi">Stop MIDI</string>
 </resources>

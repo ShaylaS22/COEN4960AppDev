@@ -34,14 +34,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Play MIDI" />
+            android:text="@string/generate_and_play_midi" />
 
         <Button
             android:id="@+id/btnStopMidi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="Stop MIDI"
+            android:text="@string/stop_midi"
             android:enabled="false" />
     </LinearLayout>
 
