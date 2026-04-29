@@ -12,6 +12,10 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+
+import com.example.lab1_task2.ui.TranscriptionFragment;
+import com.example.lab1_task2.ui.TuningFragment;
 
 import java.util.Random;
 
@@ -30,6 +34,13 @@ public class MainActivity extends AppCompatActivity {
         animationContainer = findViewById(R.id.animationContainer);
         startMusicNoteAnimation();
 
+        getSupportFragmentManager().addOnBackStackChangedListener(() -> {
+            if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+                // Back to main screen, restart animations if they were stopped
+                startMusicNoteAnimation();
+            }
+        });
+
         // Button Click Listeners
         findViewById(R.id.button1).setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, MetronomeActivity.class);
@@ -37,8 +48,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.button2).setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, TunerActivity.class);
-            startActivity(intent);
+            loadFragment(new TuningFragment());
         });
 
         findViewById(R.id.button3).setOnClickListener(v -> {
@@ -47,12 +57,21 @@ public class MainActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.button4).setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, PlaybackActivity.class);
-            startActivity(intent);
+            loadFragment(new TranscriptionFragment());
         });
     }
 
+    private void loadFragment(Fragment fragment) {
+        handler.removeCallbacksAndMessages(null); // Stop animations while fragment is shown
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.rootContainer, fragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
     private void startMusicNoteAnimation() {
+        handler.removeCallbacksAndMessages(null); // Ensure no duplicate runs
         handler.post(new Runnable() {
             @Override
             public void run() {
