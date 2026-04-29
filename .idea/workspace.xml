@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="bba87013-83ad-4a34-b1f3-01f8f54bbbb7" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/lab1_task2/app/src/main/res/layout/activity_tuning_test.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lab1_task2/app/src/main/res/layout/fragment_tuning.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab1_task2/.idea/deploymentTargetSelector.xml" beforeDir="false" afterPath="$PROJECT_DIR$/lab1_task2/.idea/deploymentTargetSelector.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab1_task2/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/lab1_task2/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab1_task2/app/src/main/java/com/example/lab1_task2/TunerActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/lab1_task2/app/src/main/java/com/example/lab1_task2/TunerActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lab1_task2/app/src/main/res/layout/activity_tuner.xml" beforeDir="false" afterPath="$PROJECT_DIR$/lab1_task2/app/src/main/res/layout/activity_tuner.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 8,
+  "fromUser": false
+}]]></component>
+  <component name="ProjectId" id="3D16dXu29WvgkaRAI5pY3nel7Qe" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/mcase/Desktop/GitHub/COEN4960AppDev"
+  }
+}]]></component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="bba87013-83ad-4a34-b1f3-01f8f54bbbb7" name="Changes" comment="" />
+      <created>1777437317800</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1777437317800</updated>
+    </task>
+    <servers />
+  </component>
+</project>
