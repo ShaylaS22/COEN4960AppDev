@@ -66,6 +66,31 @@
         android:id="@+id/tvStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sheet Music Activity"
+            android:textSize="24sp" />
+
+        <Button
+            android:id="@+id/btnPlayMidi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/generate_and_play_midi" />
+
+        <Button
+            android:id="@+id/btnStopMidi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/stop_midi"
+            android:enabled="false" />
+    </LinearLayout>
         android:layout_above="@id/llControls"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="16dp"
