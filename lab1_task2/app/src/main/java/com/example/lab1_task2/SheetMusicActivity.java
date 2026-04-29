@@ -1,17 +1,5 @@
 package com.example.lab1_task2;
 
-import android.media.MediaPlayer;
-import android.os.Bundle;
-import android.widget.Button;
-import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
-import java.io.File;
-import java.io.InputStream;
-
-public class SheetMusicActivity extends AppCompatActivity {
-    private MediaPlayer mediaPlayer;
-    private Button btnPlay;
-    private Button btnStop;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
@@ -45,6 +33,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -116,49 +105,6 @@ public class SheetMusicActivity extends AppCompatActivity {
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
-        btnPlay = findViewById(R.id.btnPlayMidi);
-        btnStop = findViewById(R.id.btnStopMidi);
-
-        btnPlay.setOnClickListener(v -> playMidi());
-        btnStop.setOnClickListener(v -> stopMidi());
-    }
-
-    private void playMidi() {
-        try {
-            // Convert sample MusicXML to MIDI
-            File midiFile = new File(getCacheDir(), "temp_midi.mid");
-            InputStream xmlInput = getResources().openRawResource(R.raw.sample_score);
-            MusicXmlToMidiConverter.convert(xmlInput, midiFile);
-            
-            mediaPlayer = new MediaPlayer();
-            mediaPlayer.setDataSource(midiFile.getAbsolutePath());
-            mediaPlayer.prepare();
-
-            if (mediaPlayer != null) {
-                mediaPlayer.setOnCompletionListener(mp -> {
-                    stopMidi();
-                });
-                mediaPlayer.start();
-                btnPlay.setEnabled(false);
-                btnStop.setEnabled(true);
-            }
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Error playing MusicXML: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void stopMidi() {
-        if (mediaPlayer != null) {
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.stop();
-            }
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
-        btnPlay.setEnabled(true);
-        btnStop.setEnabled(false);
         btnCapture.setOnClickListener(v -> takePhoto());
         btnSelect.setOnClickListener(v -> selectImageLauncher.launch("image/*"));
 
@@ -303,13 +249,23 @@ public class SheetMusicActivity extends AppCompatActivity {
                             try (FileOutputStream fos = new FileOutputStream(xmlFile)) {
                                 fos.write(xmlBytes);
                             }
+
+                            // Convert MusicXML to MIDI
+                            File midiFile = new File(getFilesDir(), "output.mid");
+                            try (InputStream fis = new FileInputStream(xmlFile)) {
+                                MusicXmlToMidiConverter.convert(fis, midiFile);
+                            } catch (Exception e) {
+                                Log.e(TAG, "MIDI conversion failed", e);
+                            }
+
                             runOnUiThread(() -> {
                                 progressBar.setVisibility(View.GONE);
                                 tvStatus.setText("Success! XML saved.");
                                 Toast.makeText(SheetMusicActivity.this, "Transcription Complete!", Toast.LENGTH_LONG).show();
 
-                                Intent intent = new Intent(SheetMusicActivity.this, TranscriptorActivity.class);
+                                Intent intent = new Intent(SheetMusicActivity.this, PlaybackActivity.class);
                                 intent.putExtra("xml_path", xmlFile.getAbsolutePath());
+                                intent.putExtra("midi_path", midiFile.getAbsolutePath());
                                 startActivity(intent);
                             });
                         } else {
@@ -346,10 +302,6 @@ public class SheetMusicActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
         cameraExecutor.shutdown();
     }
 }

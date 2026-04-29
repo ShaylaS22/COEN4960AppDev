@@ -29,7 +29,7 @@
         <activity android:name=".MetronomeActivity" />
         <activity android:name=".TunerActivity" />
         <activity android:name=".SheetMusicActivity" />
-        <activity android:name=".TranscriptorActivity" />
+        <activity android:name=".PlaybackActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.button4).setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, TranscriptorActivity.class);
+            Intent intent = new Intent(MainActivity.this, PlaybackActivity.class);
             startActivity(intent);
         });
     }
