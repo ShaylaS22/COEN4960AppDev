@@ -1,4 +1,4 @@
-### JukeBox ###
+# JukeBox #
 ## How to use Sheet Music Reader ##
 1. Launch colab.ipynb.
 2. Run all code blocks up until the one that says to upload an image.
